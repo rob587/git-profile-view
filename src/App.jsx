@@ -59,6 +59,34 @@ function App() {
       <button onClick={() => fetchProfile()}>Cerca</button>
 
       <p>hai cercato: {inputValue}</p>
+
+      {profileDatas && (
+        <div>
+          <img
+            src={profileDatas.avatar_url}
+            alt={profileDatas.name}
+            width={100}
+          />
+          <a href={profileDatas.html_url} target="_blank">
+            Vedi profilo
+          </a>
+          {profileDatas.name} , {profileDatas.bio}, {profileDatas.followers},
+          {profileDatas.public_repos}
+        </div>
+      )}
+
+      {repos.length > 0 && (
+        <ul>
+          {repos.map((repo) => (
+            <li key={repo.id}>
+              <a href={repo.html_url} target="_blank">
+                {repo.name}
+              </a>
+              {repo.description}, {repo.language},{repo.stargazers_count}
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }
