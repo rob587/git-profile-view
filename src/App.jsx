@@ -14,24 +14,39 @@ function App() {
   const [error, setError] = useState(null);
 
   async function fetchProfile() {
-    const userFetch = fetch(`https://api.github.com/users/${inputValue}`);
-    const userRepos = fetch(
-      `https://api.github.com/users/${inputValue}/repos?sort=updated&per_page=6`,
-    );
+    try {
+      setLoading(true);
+      setError(null);
+      const userFetch = fetch(`https://api.github.com/users/${inputValue}`);
+      const userRepos = fetch(
+        `https://api.github.com/users/${inputValue}/repos?sort=updated&per_page=6`,
+      );
+      const [userResponse, userReposResponse] = await Promise.all([
+        userFetch,
+        userRepos,
+      ]);
 
-    const [userResponse, userReposResponse] = await Promise.all([
-      userFetch,
-      userRepos,
-    ]);
+      if (!userResponse.ok || !userReposResponse.ok)
+        throw new Error("Utente non trovato");
 
-    const [profileData, reposData] = await Promise.all([
-      userResponse.json(),
-      userReposResponse.json(),
-    ]);
+      const [profileData, reposData] = await Promise.all([
+        userResponse.json(),
+        userReposResponse.json(),
+      ]);
+      setProfileDatas(profileData);
+      setRepos(reposData);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <>
+      {loading && <p>Caricamento...</p>}
+      {error && <p>{error}</p>}
+
       <h1>Git Profile Finder</h1>
       <input
         type="text"
@@ -40,6 +55,10 @@ function App() {
           setInputValue(e.target.value);
         }}
       />
+
+      <button onClick={() => fetchProfile()}>Cerca</button>
+
+      <p>hai cercato: {inputValue}</p>
     </>
   );
 }
