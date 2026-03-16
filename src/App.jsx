@@ -53,51 +53,172 @@ function App() {
   }, []);
 
   return (
-    <>
-      {loading && <p>Caricamento...</p>}
-      {error && <p>{error}</p>}
+    <div
+      style={{
+        maxWidth: "700px",
+        margin: "40px auto",
+        padding: "0 20px",
+        fontFamily: "sans-serif",
+        color: "#24292f",
+      }}
+    >
+      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>
+        🐙 GitHub Profile Finder
+      </h1>
 
-      <h1>Git Profile Finder</h1>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => {
-          setInputValue(e.target.value);
-        }}
-      />
+      {/* Search */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "24px" }}>
+        <input
+          type="text"
+          value={inputValue}
+          placeholder="Es. torvalds, gaearon..."
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && fetchProfile()}
+          style={{
+            flex: 1,
+            padding: "10px 14px",
+            fontSize: "16px",
+            border: "1px solid #d0d7de",
+            borderRadius: "8px",
+            outline: "none",
+          }}
+        />
+        <button
+          onClick={() => fetchProfile()}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            background: "#2da44e",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Cerca
+        </button>
+      </div>
 
-      <button onClick={() => fetchProfile()}>Cerca</button>
+      {/* Stati */}
+      {loading && <p style={{ color: "#666" }}>⏳ Caricamento...</p>}
+      {error && <p style={{ color: "#cf222e" }}>❌ {error}</p>}
 
-      <p>hai cercato: {inputValue}</p>
-
+      {/* Profilo */}
       {profileDatas && (
-        <div>
+        <div
+          style={{
+            display: "flex",
+            gap: "20px",
+            alignItems: "center",
+            padding: "20px",
+            border: "1px solid #d0d7de",
+            borderRadius: "12px",
+            marginBottom: "24px",
+          }}
+        >
           <img
             src={profileDatas.avatar_url}
             alt={profileDatas.name}
-            width={100}
+            style={{ width: "80px", height: "80px", borderRadius: "50%" }}
           />
-          <a href={profileDatas.html_url} target="_blank">
-            Vedi profilo
-          </a>
-          {profileDatas.name} , {profileDatas.bio}, {profileDatas.followers},
-          {profileDatas.public_repos}
+          <div>
+            <h2 style={{ margin: "0 0 4px", fontSize: "20px" }}>
+              {profileDatas.name}
+            </h2>
+            <p style={{ margin: "0 0 8px", color: "#666", fontSize: "14px" }}>
+              {profileDatas.bio}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: "16px",
+                fontSize: "14px",
+                color: "#444",
+              }}
+            >
+              <span>👥 {profileDatas.followers} followers</span>
+              <span>📦 {profileDatas.public_repos} repo</span>
+            </div>
+            <a
+              href={profileDatas.html_url}
+              target="_blank"
+              style={{
+                display: "inline-block",
+                marginTop: "10px",
+                fontSize: "14px",
+                color: "#0969da",
+                textDecoration: "none",
+              }}
+            >
+              Vedi profilo →
+            </a>
+          </div>
         </div>
       )}
 
+      {/* Repo */}
       {repos.length > 0 && (
-        <ul>
-          {repos.map((repo) => (
-            <li key={repo.id}>
-              <a href={repo.html_url} target="_blank">
-                {repo.name}
-              </a>
-              {repo.description}, {repo.language},{repo.stargazers_count}
-            </li>
-          ))}
-        </ul>
+        <div>
+          <h3 style={{ fontSize: "16px", marginBottom: "12px", color: "#666" }}>
+            Ultimi repository
+          </h3>
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "12px",
+            }}
+          >
+            {repos.map((repo) => (
+              <li
+                key={repo.id}
+                style={{
+                  padding: "14px",
+                  border: "1px solid #d0d7de",
+                  borderRadius: "8px",
+                }}
+              >
+                <a
+                  href={repo.html_url}
+                  target="_blank"
+                  style={{
+                    fontWeight: "bold",
+                    color: "#0969da",
+                    textDecoration: "none",
+                    fontSize: "15px",
+                  }}
+                >
+                  {repo.name}
+                </a>
+                <p
+                  style={{
+                    margin: "6px 0",
+                    fontSize: "13px",
+                    color: "#666",
+                    minHeight: "36px",
+                  }}
+                >
+                  {repo.description || "Nessuna descrizione"}
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    fontSize: "13px",
+                    color: "#444",
+                  }}
+                >
+                  {repo.language && <span>🔵 {repo.language}</span>}
+                  <span>⭐ {repo.stargazers_count}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-    </>
+    </div>
   );
 }
 
