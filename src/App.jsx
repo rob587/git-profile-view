@@ -1,7 +1,7 @@
 // Profilo utente
 // https://api.github.com/users/USERNAME
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Repository dell'utente
 // https://api.github.com/users/USERNAME/repos?sort=updated&per_page=6
@@ -13,13 +13,14 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  async function fetchProfile() {
+  async function fetchProfile(providedUser = null) {
+    const userToSearch = (providedUser || inputValue).trim();
     try {
       setLoading(true);
       setError(null);
-      const userFetch = fetch(`https://api.github.com/users/${inputValue}`);
+      const userFetch = fetch(`https://api.github.com/users/${userToSearch}`);
       const userRepos = fetch(
-        `https://api.github.com/users/${inputValue}/repos?sort=updated&per_page=6`,
+        `https://api.github.com/users/${userToSearch}/repos?sort=updated&per_page=6`,
       );
       const [userResponse, userReposResponse] = await Promise.all([
         userFetch,
@@ -33,6 +34,7 @@ function App() {
         userResponse.json(),
         userReposResponse.json(),
       ]);
+      localStorage.setItem("lastUser", userToSearch);
       setProfileDatas(profileData);
       setRepos(reposData);
     } catch (err) {
@@ -41,6 +43,14 @@ function App() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("lastUser");
+    if (savedUser) {
+      setInputValue(savedUser);
+      fetchProfile(savedUser);
+    }
+  }, []);
 
   return (
     <>
